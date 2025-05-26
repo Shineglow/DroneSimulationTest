@@ -14,7 +14,7 @@ namespace ComponentsGeneral
             _canTakeDamage = canTakeDamage;
         }
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, IDamageDealer damageDealer)
         {
             if (_canTakeDamage is { Value: true })
             {

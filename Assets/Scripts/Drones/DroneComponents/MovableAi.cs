@@ -9,6 +9,7 @@ namespace Drones.DroneComponents
     public class MovableAi : MonoBehaviour
     {
         [SerializeField] private NavMeshAgent navMeshAgent;
+        [SerializeField] private Rigidbody rb;
         [SerializeField] private Transform moveTo;
         [SerializeField] private float destinationEpsilon;
         private Vector3 _targetPosition;
@@ -30,6 +31,13 @@ namespace Drones.DroneComponents
             _targetPosition = position;
             navMeshAgent.SetDestination(position);
             WaitForStop().Forget();
+        }
+
+        public void SetPosition(Vector3 position)
+        {
+            rb.gameObject.SetActive(false);
+            rb.transform.position = position;
+            rb.gameObject.SetActive(true);
         }
 
         private void OnTriggerEnter(Collider other)

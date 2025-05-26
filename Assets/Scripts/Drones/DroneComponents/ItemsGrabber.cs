@@ -1,6 +1,5 @@
 using System;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
 
 namespace Drones.DroneComponents
@@ -15,19 +14,26 @@ namespace Drones.DroneComponents
 		
 		private void OnTriggerEnter(Collider other)
 		{
-			if (other.gameObject.layer == LayerMask.NameToLayer("Item") && other.TryGetComponent(out ResourceItemItemMono item))
+			if (other.gameObject.layer == LayerMask.NameToLayer("ResourceItem") && other.TryGetComponent(out ResourceItemMono item))
 			{
+				Debug.Log($"{other.gameObject.name}");
 				MoveToSelf(item).Forget();
 			}
 		}
 
-		private async UniTaskVoid MoveToSelf(ResourceItemItemMono item)
+		private async UniTaskVoid MoveToSelf(ResourceItemMono item)
 		{
-			var position = transform.position;
-			await item.transform
-					  .DOMove(position, (position - item.transform.position).magnitude / grabSpeed)
-					  .AsyncWaitForCompletion()
-					  .AsUniTask();
+			var sqrSpeed = grabSpeed * grabSpeed;
+			var direction = (item.transform.position - transform.position);
+			float sqrDistance = direction.sqrMagnitude;
+			while (sqrDistance > 0.2f)
+			{
+				var delta = sqrSpeed < sqrDistance ? grabSpeed : Mathf.Sqrt(sqrDistance);
+				
+				item.MoveDelta(direction.normalized*delta);
+				sqrDistance = direction.sqrMagnitude;
+				await UniTask.Yield();
+			}
 			
 			OnResourceGrabbed?.Invoke(item);
 		}

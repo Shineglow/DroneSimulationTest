@@ -8,13 +8,17 @@ using UnityEngine;
 namespace Drones.DroneComponents
 {
 	[RequireComponent(typeof(Collider))]
-	public class Miner : DroneInteractionComponent
+	public class Miner : DroneInteractionComponent, IDamageDealer
 	{
+		public Vector3 Position => transform.position;
+		
 		public override event Action<DroneInteractionComponent> OnInteractionPossible;
 		private List<IDamageable> _resourceInArea = new();
 		[SerializeField] private float resourceDamage;
 		[SerializeField] private float mineSpeed;
 		private int _delayMilliseconds;
+		
+		
 
 		private void Awake()
 		{
@@ -26,7 +30,7 @@ namespace Drones.DroneComponents
 			_interactionStopRequested = false;
 			while (_resourceInArea[0].CanTakeDamage())
 			{
-				_resourceInArea[0].TakeDamage(resourceDamage);
+				_resourceInArea[0].TakeDamage(resourceDamage, this);
 				if (interactCancellationToken.IsCancellationRequested || _interactionStopRequested)
 				{
 					return;
